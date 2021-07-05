@@ -209,3 +209,6 @@ output "alb_dns_name" {
 output "domain_name" {
   value = aws_route53_record.example.name
 }
+output "lb_target_group" {
+  value = aws_lb_target_group.example
+}
