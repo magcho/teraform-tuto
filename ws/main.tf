@@ -1,6 +1,6 @@
 
 
-provider "aws"{
+provider "aws" {
   region = "ap-northeast-1"
 }
 
@@ -18,6 +18,10 @@ module "describe_regions_for_ec2" {
   policy     = data.aws_iam_policy_document.allow_describe_regions.json
 }
 
-module "s3_buckets"{
+module "s3_buckets" {
   source = "./s3"
+}
+
+module "vpc" {
+  source = "./vpc"
 }
