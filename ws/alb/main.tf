@@ -15,7 +15,7 @@ resource "aws_lb" "example" {
   load_balancer_type         = "application"
   internal                   = false
   idle_timeout               = 60
-  enable_deletion_protection = true
+  enable_deletion_protection = false # delete protection するとdestroyできないので困る
 
   subnets = var.subnets
   access_logs {
@@ -88,6 +88,43 @@ resource "aws_route53_record" "example" {
   }
 }
 
+# 8.7
+# resource "aws_acm_certificate" "example" {
+#   domain_name               = aws_route53_record.example.name
+#   subject_alternative_names = []
+#   validation_method         = "DNS"
+
+#   lifecycle {
+#     create_before_destroy = true # ブルーグリーンデプロイする（新を作成して置換してから旧を殺す）
+#   }
+# }
+
+# # 8.8
+# resource "aws_route53_record" "example_certificate" {
+#   # 8.7で作成したssl証明書のDNS認証用レコードの登録
+#   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation
+#   for_each = {
+#     for dvo in aws_acm_certificate.example.domain_validation_options : dvo.domain_name => {
+#       name   = dvo.resource_record_name
+#       record = dvo.resource_record_value
+#       type   = dvo.resource_record_type
+#     }
+#   }
+
+#   allow_overwrite = true
+#   name            = each.vlaue_name
+#   records         = [each.value.record]
+#   ttl             = 60
+#   type            = each.value.type
+#   zone_id         = data.aws_route53_zone.example.zone_id
+# }
+
+# # 8.9
+# resource "aws_acm_certificate_validation" "example" {
+#   # SSL証明書の検証完了まで待機
+#   certificate_arn         = aws_acm_certificate.example.arn
+#   validation_record_fqdns = [aws_route53_record.example_certificate.fqdn]
+# }
 
 
 output "alb_dns_name" {
