@@ -2,11 +2,11 @@
 
 
 
-variable subnets {
+variable "subnets" {
   type = list(string)
 }
-variable alb_log_s3_bucket {}
-variable vpc_id {}
+variable "alb_log_s3_bucket" {}
+variable "vpc_id" {}
 
 
 # 8.1
@@ -89,43 +89,62 @@ resource "aws_route53_record" "example" {
 }
 
 # 8.7
-# resource "aws_acm_certificate" "example" {
-#   domain_name               = aws_route53_record.example.name
-#   subject_alternative_names = []
-#   validation_method         = "DNS"
+resource "aws_acm_certificate" "example" {
+  domain_name               = aws_route53_record.example.name
+  subject_alternative_names = []
+  validation_method         = "DNS"
 
-#   lifecycle {
-#     create_before_destroy = true # ブルーグリーンデプロイする（新を作成して置換してから旧を殺す）
-#   }
-# }
+  lifecycle {
+    create_before_destroy = true # ブルーグリーンデプロイする（新を作成して置換してから旧を殺す）
+  }
+}
 
-# # 8.8
-# resource "aws_route53_record" "example_certificate" {
-#   # 8.7で作成したssl証明書のDNS認証用レコードの登録
-#   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation
-#   for_each = {
-#     for dvo in aws_acm_certificate.example.domain_validation_options : dvo.domain_name => {
-#       name   = dvo.resource_record_name
-#       record = dvo.resource_record_value
-#       type   = dvo.resource_record_type
-#     }
-#   }
+# 8.8
+resource "aws_route53_record" "example_certificate" {
+  # 8.7で作成したssl証明書のDNS認証用レコードの登録
+  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation
+  for_each = {
+    for dvo in aws_acm_certificate.example.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
 
-#   allow_overwrite = true
-#   name            = each.vlaue_name
-#   records         = [each.value.record]
-#   ttl             = 60
-#   type            = each.value.type
-#   zone_id         = data.aws_route53_zone.example.zone_id
-# }
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.example.zone_id
+}
 
-# # 8.9
-# resource "aws_acm_certificate_validation" "example" {
-#   # SSL証明書の検証完了まで待機
-#   certificate_arn         = aws_acm_certificate.example.arn
-#   validation_record_fqdns = [aws_route53_record.example_certificate.fqdn]
-# }
+# 8.9
+resource "aws_acm_certificate_validation" "example" {
+  # SSL証明書の検証完了まで待機
+  certificate_arn         = aws_acm_certificate.example.arn
+  validation_record_fqdns = [for record in aws_route53_record.example_certificate : record.fqdn]
+}
 
+
+# 8.10
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.example.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.example.arn
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "これは[HTTPS]です"
+      status_code  = "200"
+    }
+  }
+}
 
 output "alb_dns_name" {
   value = aws_lb.example.dns_name
