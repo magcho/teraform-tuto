@@ -177,9 +177,19 @@ resource "aws_nat_gateway" "nat_gateway_1" {
 
 # 7.21
 module "example_sg" {
-  source      = "./security_group"
+  source      = "../security_group"
   name        = "module-sg"
   vpc_id      = aws_vpc.example.id
   port        = 80
   cidr_blocks = ["0.0.0.0/0"]
+}
+
+output "aws_subnet_public_0_id"{
+  value = aws_subnet.public_0.id
+}
+output "aws_subnet_public_1_id"{
+  value = aws_subnet.public_1.id
+}
+output "aws_vpc_id"{
+  value = aws_vpc.example.id
 }

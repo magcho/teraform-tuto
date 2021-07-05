@@ -75,3 +75,7 @@ resource "aws_s3_bucket_policy" "alb_log" {
   policy = data.aws_iam_policy_document.alb_log.json
 
 }
+
+output "aws_s3_bucket_alb_log_id"{
+  value= aws_s3_bucket.alb_log.id
+}
