@@ -2198,3 +2198,22 @@ Info 2194 [02:40:38.353] Different program with same set of files:: structureIsR
 Info 2195 [02:40:40.674] Starting updateGraphWorker: Project: /dev/null/inferredProject1*
 Info 2196 [02:40:40.679] Finishing updateGraphWorker: Project: /dev/null/inferredProject1* Version: 224 structureChanged: false Elapsed: 4.746847867965698ms
 Info 2197 [02:40:40.679] Different program with same set of files:: structureIsReused:: 2
+Info 2198 [15:42:29.591] Starting updateGraphWorker: Project: /dev/null/inferredProject1*
+Info 2199 [15:42:29.651] Finishing updateGraphWorker: Project: /dev/null/inferredProject1* Version: 225 structureChanged: false Elapsed: 55.08273100852966ms
+Info 2200 [15:42:29.651] Different program with same set of files:: structureIsReused:: 2
+Info 2201 [15:42:29.889] Starting updateGraphWorker: Project: /dev/null/inferredProject1*
+Info 2202 [15:42:29.897] Finishing updateGraphWorker: Project: /dev/null/inferredProject1* Version: 226 structureChanged: false Elapsed: 7.281605005264282ms
+Info 2203 [15:42:29.897] Different program with same set of files:: structureIsReused:: 2
+Info 2204 [15:42:30.307] Starting updateGraphWorker: Project: /dev/null/inferredProject1*
+Info 2205 [15:42:30.316] Finishing updateGraphWorker: Project: /dev/null/inferredProject1* Version: 227 structureChanged: false Elapsed: 7.956089973449707ms
+Info 2206 [15:42:30.316] Different program with same set of files:: structureIsReused:: 2
+Info 2207 [15:44:57.070] Search path: /Users/magcho/Documents/git/teraform-tuto/ws/ecs
+Info 2208 [15:44:57.072] For info: /Users/magcho/Documents/git/teraform-tuto/ws/ecs/container_definetions.json :: No config files found.
+Info 2209 [15:44:57.074] Starting updateGraphWorker: Project: /dev/null/inferredProject1*
+Info 2210 [15:44:57.079] Finishing updateGraphWorker: Project: /dev/null/inferredProject1* Version: 228 structureChanged: false Elapsed: 4.987169027328491ms
+Info 2211 [15:44:57.079] Project '/dev/null/inferredProject1*' (Inferred)
+Info 2212 [15:44:57.079] 	Files (19)
+
+Info 2213 [15:44:57.079] -----------------------------------------------
+Info 2214 [15:55:07.142] FileWatcher:: Triggered with /Users/magcho/Documents/git/teraform-tuto/ws/ecs/container_definetions.json 2:: WatchInfo: /Users/magcho/Documents/git/teraform-tuto/ws/ecs/container_definetions.json 500 undefined WatchType: Closed Script info
+Info 2215 [15:55:07.144] Elapsed:: 1.7859690189361572ms FileWatcher:: Triggered with /Users/magcho/Documents/git/teraform-tuto/ws/ecs/container_definetions.json 2:: WatchInfo: /Users/magcho/Documents/git/teraform-tuto/ws/ecs/container_definetions.json 500 undefined WatchType: Closed Script info

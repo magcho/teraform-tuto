@@ -1,9 +1,11 @@
 
 
 
-provider "aws"{
-  region = "ap-northeast-1"
-}
+# anti pattern
+# モジュール内でproviderを書いてはいけない
+# provider "aws"{
+#   region = "ap-northeast-1"
+# }
 
 # 7.20
 variable "name" {}

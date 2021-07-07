@@ -19,8 +19,30 @@ resource "aws_ecs_task_definition" "example" {
   cpu                      = "256" # 1024 = 1vCPU
   memory                   = "512"
   network_mode             = "awsvpc"
-  container_definitions    = file("./ecs/container_definetions.json")
-  execution_role_arn       = module.ecs_task_execution_role.iam_role_arn
+  container_definitions = jsonencode(
+    [
+      {
+        "name" : "example",
+        "image" : "nginx:latest",
+        "essential" : true,
+        "logConfiguration" : {
+          "logDriver" : "awslogs",
+          "options" : {
+            "awslogs-region" : "ap-northeast-1",
+            "awslogs-stream-prefix" : "nginx",
+            "awslogs-group" : "/ecs/example"
+          }
+        },
+        "portMappings" : [
+          {
+            "protocol" : "tcp",
+            "containerPort" : 80
+          }
+        ]
+      }
+    ]
+  )
+  execution_role_arn = module.ecs_task_execution_role.iam_role_arn
 }
 
 # 9.4
@@ -34,7 +56,7 @@ resource "aws_ecs_service" "example" {
   health_check_grace_period_seconds = 60
 
   network_configuration {
-    assign_public_ip = false
+    assign_public_ip = true
     security_groups  = [module.nginx_sg.security_group_id]
     subnets          = var.subnets
   }
@@ -45,9 +67,9 @@ resource "aws_ecs_service" "example" {
     container_port   = 80
   }
 
-  lifecycle {
-    ignore_changes = [task_definition]
-  }
+  # lifecycle {
+  # ignore_changes = [task_definition]
+  # }
 }
 
 module "nginx_sg" {
@@ -55,6 +77,14 @@ module "nginx_sg" {
   name        = "nginx-sg"
   vpc_id      = var.vpc_id
   port        = 80
+  cidr_blocks = [var.vpc_cidr_block]
+}
+
+module "https_pull_sg" {
+  source      = "../security_group"
+  name        = "https_pull_sg"
+  vpc_id      = var.vpc_id
+  port        = 443
   cidr_blocks = [var.vpc_cidr_block]
 }
 

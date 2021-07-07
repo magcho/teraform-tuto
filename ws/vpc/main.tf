@@ -27,12 +27,18 @@ resource "aws_subnet" "public_0" {
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "ap-northeast-1a"
   map_public_ip_on_launch = true
+  tags = {
+    Name = "public_0"
+  }
 }
 resource "aws_subnet" "public_1" {
   vpc_id                  = aws_vpc.example.id
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "ap-northeast-1c"
   map_public_ip_on_launch = true
+  tags = {
+    Name = "public_1"
+  }
 }
 
 # 7.3
@@ -89,12 +95,18 @@ resource "aws_subnet" "private_0" {
   cidr_block              = "10.0.65.0/24"
   availability_zone       = "ap-northeast-1a"
   map_public_ip_on_launch = false
+  tags = {
+    Name = "private_0"
+  }
 }
 resource "aws_subnet" "private_1" {
   vpc_id                  = aws_vpc.example.id
   cidr_block              = "10.0.66.0/24"
   availability_zone       = "ap-northeast-1c"
   map_public_ip_on_launch = false
+  tags = {
+    Name = "private_1"
+  }
 }
 
 # 7.8
@@ -152,10 +164,16 @@ resource "aws_route_table_association" "private_1" {
 resource "aws_eip" "nat_gateway_0" {
   vpc        = true
   depends_on = [aws_internet_gateway.example]
+  tags = {
+    Name = "0"
+  }
 }
 resource "aws_eip" "nat_gateway_1" {
   vpc        = true
   depends_on = [aws_internet_gateway.example]
+  tags = {
+    Name = "1"
+  }
 }
 resource "aws_nat_gateway" "nat_gateway_0" {
   allocation_id = aws_eip.nat_gateway_0.id
@@ -167,6 +185,7 @@ resource "aws_nat_gateway" "nat_gateway_1" {
   subnet_id     = aws_subnet.public_1.id
   depends_on    = [aws_internet_gateway.example]
 }
+
 
 # 7.11
 # resource "aws_route" "private" {
@@ -184,22 +203,22 @@ module "example_sg" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
-output "aws_subnet_public_0_id"{
+output "aws_subnet_public_0_id" {
   value = aws_subnet.public_0.id
 }
-output "aws_subnet_public_1_id"{
+output "aws_subnet_public_1_id" {
   value = aws_subnet.public_1.id
 }
-output "aws_vpc_id"{
+output "aws_vpc_id" {
   value = aws_vpc.example.id
 }
-output "aws_vpc_cidr_block"{
+output "aws_vpc_cidr_block" {
   value = aws_vpc.example.cidr_block
 }
 
-output "aws_subnet_private_0_id"{
+output "aws_subnet_private_0_id" {
   value = aws_subnet.private_0.id
 }
-output "aws_subnet_private_1_id"{
+output "aws_subnet_private_1_id" {
   value = aws_subnet.private_1.id
 }
