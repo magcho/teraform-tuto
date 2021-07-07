@@ -47,16 +47,16 @@ resource "aws_ecs_task_definition" "example" {
 
 # 9.4
 resource "aws_ecs_service" "example" {
-  name                              = "example"
+  name                              = "example-ecs-service"
   cluster                           = aws_ecs_cluster.example.arn
   task_definition                   = aws_ecs_task_definition.example.arn
-  desired_count                     = 2
+  desired_count                     = 1
   launch_type                       = "FARGATE"
   platform_version                  = "1.3.0"
   health_check_grace_period_seconds = 60
 
   network_configuration {
-    assign_public_ip = true
+    assign_public_ip = false
     security_groups  = [module.nginx_sg.security_group_id]
     subnets          = var.subnets
   }
@@ -80,13 +80,6 @@ module "nginx_sg" {
   cidr_blocks = [var.vpc_cidr_block]
 }
 
-module "https_pull_sg" {
-  source      = "../security_group"
-  name        = "https_pull_sg"
-  vpc_id      = var.vpc_id
-  port        = 443
-  cidr_blocks = [var.vpc_cidr_block]
-}
 
 # 9.5
 resource "aws_cloudwatch_log_group" "for_ecs" {
