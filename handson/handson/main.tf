@@ -164,28 +164,76 @@ resource "aws_route_table" "private_1d" {
 
 resource "aws_route" "private_1a" {
   destination_cidr_block = "0.0.0.0/0"
-  route_table_id = aws_route_table.private_1a.id
-  nat_gateway_id = aws_nat_gateway.nat_1a.id
+  route_table_id         = aws_route_table.private_1a.id
+  nat_gateway_id         = aws_nat_gateway.nat_1a.id
 }
 resource "aws_route" "private_1c" {
   destination_cidr_block = "0.0.0.0/0"
-  route_table_id = aws_route_table.private_1c.id
-  nat_gateway_id = aws_nat_gateway.nat_1c.id
+  route_table_id         = aws_route_table.private_1c.id
+  nat_gateway_id         = aws_nat_gateway.nat_1c.id
 }
 resource "aws_route" "private_1d" {
   destination_cidr_block = "0.0.0.0/0"
-  route_table_id = aws_route_table.private_1d.id
-  nat_gateway_id = aws_nat_gateway.nat_1d.id
+  route_table_id         = aws_route_table.private_1d.id
+  nat_gateway_id         = aws_nat_gateway.nat_1d.id
 }
 resource "aws_route_table_association" "private_1a" {
-  subnet_id = aws_subnet.private_1a.id
+  subnet_id      = aws_subnet.private_1a.id
   route_table_id = aws_route_table.private_1a.id
 }
 resource "aws_route_table_association" "private_1c" {
-  subnet_id = aws_subnet.private_1c.id
+  subnet_id      = aws_subnet.private_1c.id
   route_table_id = aws_route_table.private_1c.id
 }
 resource "aws_route_table_association" "private_1d" {
-  subnet_id = aws_subnet.private_1d.id
+  subnet_id      = aws_subnet.private_1d.id
   route_table_id = aws_route_table.private_1d.id
+}
+
+# ALB
+resource "aws_security_group" "alb" {
+  name        = "handson-alb"
+  description = "handson-alb"
+  vpc_id      = aws_vpc.main.id
+
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "handson-alb"
+  }
+}
+resource "aws_security_group_rule" "alb_http" {
+  security_group_id = aws_security_group.alb.id
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+
+  cidr_blocks = ["0.0.0.0/0"]
+}
+resource "aws_alb" "main" {
+  load_balancer_type = "application"
+  name               = "handson"
+  security_groups    = [aws_security_group.alb.id]
+  subnets            = [aws_subnet.public_1a.id, aws_subnet.public_1c.id, aws_subnet.public_1d.id]
+}
+
+resource "aws_alb_listener" "main" {
+  port     = "80"
+  protocol = "HTTP"
+
+  load_balancer_arn = aws_alb.main.arn
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "200"
+      message_body = "ok"
+    }
+  }
 }
