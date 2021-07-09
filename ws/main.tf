@@ -44,5 +44,5 @@ module "ecs" {
   ]
   lb_target_group = module.alb.lb_target_group
   vpc_id          = module.vpc.aws_vpc_id
-  vpc_cidr_block  = module.vpc.aws_vpc_cidr_block
+  vpc_cidr_blocks  = [module.vpc.aws_vpc_cidr_block]
 }

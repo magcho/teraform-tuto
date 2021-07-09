@@ -23,19 +23,19 @@ resource "aws_vpc" "example" {
 
 # 7.12
 resource "aws_subnet" "public_0" {
-  vpc_id                  = aws_vpc.example.id
-  cidr_block              = "10.0.1.0/24"
-  availability_zone       = "ap-northeast-1a"
-  map_public_ip_on_launch = true
+  vpc_id            = aws_vpc.example.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "ap-northeast-1a"
+  # map_public_ip_on_launch = true
   tags = {
     Name = "public_0"
   }
 }
 resource "aws_subnet" "public_1" {
-  vpc_id                  = aws_vpc.example.id
-  cidr_block              = "10.0.2.0/24"
-  availability_zone       = "ap-northeast-1c"
-  map_public_ip_on_launch = true
+  vpc_id            = aws_vpc.example.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "ap-northeast-1c"
+  # map_public_ip_on_launch = true
   tags = {
     Name = "public_1"
   }
@@ -50,6 +50,9 @@ resource "aws_internet_gateway" "example" {
 # 7.4
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.example.id
+  tags = {
+    Name = "example_public"
+  }
 }
 
 
@@ -91,19 +94,19 @@ resource "aws_route_table_association" "public_1" {
 
 # 7.14
 resource "aws_subnet" "private_0" {
-  vpc_id                  = aws_vpc.example.id
-  cidr_block              = "10.0.65.0/24"
-  availability_zone       = "ap-northeast-1a"
-  map_public_ip_on_launch = false
+  vpc_id            = aws_vpc.example.id
+  cidr_block        = "10.0.65.0/24"
+  availability_zone = "ap-northeast-1a"
+  # map_public_ip_on_launch = false
   tags = {
     Name = "private_0"
   }
 }
 resource "aws_subnet" "private_1" {
-  vpc_id                  = aws_vpc.example.id
-  cidr_block              = "10.0.66.0/24"
-  availability_zone       = "ap-northeast-1c"
-  map_public_ip_on_launch = false
+  vpc_id            = aws_vpc.example.id
+  cidr_block        = "10.0.66.0/24"
+  availability_zone = "ap-northeast-1c"
+  # map_public_ip_on_launch = false
   tags = {
     Name = "private_1"
   }
@@ -121,9 +124,15 @@ resource "aws_subnet" "private_1" {
 # 7.16
 resource "aws_route_table" "private_0" {
   vpc_id = aws_vpc.example.id
+  tags = {
+    Name = "exmaple_prviate0"
+  }
 }
 resource "aws_route_table" "private_1" {
   vpc_id = aws_vpc.example.id
+  tags = {
+    Name = "exmaple_prviate1"
+  }
 }
 resource "aws_route" "private_0" {
   route_table_id         = aws_route_table.private_0.id

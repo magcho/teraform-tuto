@@ -19,12 +19,11 @@ resource "aws_ecs_task_definition" "example" {
   cpu                      = "256" # 1024 = 1vCPU
   memory                   = "512"
   network_mode             = "awsvpc"
-  container_definitions = jsonencode(
+  container_definitions    = <<EOL
     [
       {
         "name" : "example",
-        "image" : "nginx:latest",
-        "essential" : true,
+        "image" : "nginx:1.14",
         "logConfiguration" : {
           "logDriver" : "awslogs",
           "options" : {
@@ -35,14 +34,14 @@ resource "aws_ecs_task_definition" "example" {
         },
         "portMappings" : [
           {
-            "protocol" : "tcp",
-            "containerPort" : 80
+            "containerPort" : 80,
+            "hostPort": 80
           }
         ]
       }
     ]
-  )
-  execution_role_arn = module.ecs_task_execution_role.iam_role_arn
+  EOL
+  execution_role_arn       = module.ecs_task_execution_role.iam_role_arn
 }
 
 # 9.4
@@ -50,15 +49,18 @@ resource "aws_ecs_service" "example" {
   name                              = "example-ecs-service"
   cluster                           = aws_ecs_cluster.example.arn
   task_definition                   = aws_ecs_task_definition.example.arn
-  desired_count                     = 1
+  desired_count                     = 2
   launch_type                       = "FARGATE"
   platform_version                  = "1.3.0"
   health_check_grace_period_seconds = 60
 
   network_configuration {
     assign_public_ip = false
-    security_groups  = [module.nginx_sg.security_group_id]
-    subnets          = var.subnets
+    # security_groups  = [module.nginx_sg.security_group_id]
+    security_groups = [
+      aws_security_group.ecs.id,
+    ]
+    subnets = var.subnets
   }
 
   load_balancer {
@@ -72,14 +74,35 @@ resource "aws_ecs_service" "example" {
   # }
 }
 
-module "nginx_sg" {
-  source      = "../security_group"
-  name        = "nginx-sg"
-  vpc_id      = var.vpc_id
-  port        = 80
-  cidr_blocks = [var.vpc_cidr_block]
-}
+# module "nginx_sg" {
+#   source      = "../security_group"
+#   name        = "nginx-sg"
+#   vpc_id      = var.vpc_id
+#   port        = 80
+#   cidr_blocks = [var.vpc_cidr_block]
+# }
+resource "aws_security_group" "ecs" {
+  name        = "nginx_sg"
+  description = "nginx_sg"
 
+  vpc_id = var.vpc_id
+}
+resource "aws_security_group_rule" "ecs_ingress" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["10.0.0.0/16"]
+  security_group_id = aws_security_group.ecs.id
+}
+resource "aws_security_group_rule" "ecs_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ecs.id
+}
 
 # 9.5
 resource "aws_cloudwatch_log_group" "for_ecs" {
