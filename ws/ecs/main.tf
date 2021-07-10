@@ -5,7 +5,7 @@ variable "subnets" {
 }
 variable "lb_target_group" {}
 variable "vpc_id" {}
-variable "vpc_cidr_block" {}
+variable "vpc_cidr_blocks" {}
 
 # 9.1
 resource "aws_ecs_cluster" "example" {
@@ -49,7 +49,7 @@ resource "aws_ecs_service" "example" {
   name                              = "example-ecs-service"
   cluster                           = aws_ecs_cluster.example.arn
   task_definition                   = aws_ecs_task_definition.example.arn
-  desired_count                     = 2
+  desired_count                     = 1
   launch_type                       = "FARGATE"
   platform_version                  = "1.3.0"
   health_check_grace_period_seconds = 60
@@ -57,9 +57,7 @@ resource "aws_ecs_service" "example" {
   network_configuration {
     assign_public_ip = false
     # security_groups  = [module.nginx_sg.security_group_id]
-    security_groups = [
-      aws_security_group.ecs.id,
-    ]
+    security_groups = [aws_security_group.ecs.id]
     subnets = var.subnets
   }
 
@@ -79,7 +77,7 @@ resource "aws_ecs_service" "example" {
 #   name        = "nginx-sg"
 #   vpc_id      = var.vpc_id
 #   port        = 80
-#   cidr_blocks = [var.vpc_cidr_block]
+#   cidr_blocks = var.vpc_cidr_blocks
 # }
 resource "aws_security_group" "ecs" {
   name        = "nginx_sg"
